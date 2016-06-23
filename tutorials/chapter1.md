@@ -165,27 +165,23 @@ Picking a text editor is kind of like picking a car. There are lightweight agile
 
 ## Part 1: Writing Haskell Programs
 
-Let's start by looking at a simple `"Hello world!"` program, which we might place in a file, `Main.hs`: 
+Let's keep it old skool and start by creating a simple `Hello world!` program. 
+
+### Task (1a): Hello World in Haskell
+
+Open up a new file in Sublime and paste in the following code:
 
 ``` Haskell
 module Main where   -- A comment, starting with `--` 
 
--- Equivalent to `def main: IO[Unit] = ...`
+-- Equivalent to `def main: IO[Unit] = ...` in Scala
 main :: IO ()
-main = putStr "Hello world!!"
+main = putStrLn "Hello world!!"
 ```
 
-We can compile this using the [Glasgow Haskell Compiler](http://www.haskell.org/ghc/) (GHC), which comes bundled with the [Haskell Platform](http://www.haskell.org/platform/). 
+Then save the file with the name `Main.hs`. 
 
-```
-> ghc --make Main
-[1 of 1] Compiling Main             ( Main.hs, Main.o )
-Linking Main ...
-> ./Main
-Hello world!!
-```
-
-Module declarations start with the keyword `module`, then are followed by a module name (here `Main`, but `Foo.Bar.Baz` and `Data.List` are also valid module names), then the keyword `where`. Like Java, module names must follow directory structure, so `Foo.Bar` must live in a file called `Bar.hs` inside the `Foo/` directory.
+Already we can see some interesting language elements. Module declarations start with the keyword `module`, then are followed by a module name (here `Main`, but `Foo.Bar.Baz` and `Data.List` are also valid module names), then the keyword `where`. Like Java, module names must follow directory structure, so `Foo.Bar` must live in a file called `Bar.hs` inside the `Foo/` directory.
   
 The entry point of a Haskell program is the `main` function. In Haskell, type signatures _precede_ the declaration of the value. So `main :: IO ()` is a type signature, preceding the definition of `main = putStr "Hello world!!"` on the subsequent line. We pronounce the `::` symbol as 'has type'.
 
@@ -195,27 +191,164 @@ Since Haskell is pure, it uses an `IO` type to represent computations that may i
 * `Map[String,Double]` vs `Map String Double`
 * `Map[String,Map[K,V]]` vs `Map String (Map k v)`: In Haskell, type variables must begin with a lowercase letter. Names starting with uppercase are reserved for concrete types and data constructor names. 
 
+### Task (1b): Compilation
+
+We can compile `Main.hs` using GHC from a new Terminal window like so: 
+
+```
+cem3394$ ghc --make Main
+[1 of 1] Compiling Main             ( Main.hs, Main.o )
+Linking Main ...
+```
+
+First however you're going to have to make sure you're in the right directory. Ask your neighbor or teach yourself the `pwd`, `cd` and `ls` [commands in Unix](http://mally.stanford.edu/~sr/computing/basic-unix.html). 
+
+What is linking? Ah, I was hoping you'd ask! Here's another Wikipedia [rabbit hole](https://en.wikipedia.org/wiki/Linker_(computing)) for you.
+
+### Task (1c): Execution
+
+Now that your `Main.hs` code is compiled, try and run it as an executable in your Terminal:
+
+```
+cem3394$ ./Main
+Hello world!!
+```
+
+You should also try starting a REPL and loading your `main` fuction in this way:
+
+```
+cem3394$ ghci
+GHCi, version 7.10.3: http://www.haskell.org/ghc/  :? for help
+Prelude> :l Main
+[1 of 1] Compiling Main             ( Main.hs, interpreted )
+Ok, modules loaded: Main.
+*Main> main
+Hello world!!
+*Main>
+```
+
+Congrats!! You've written and compiled your first Haskell program! You are now a Haskell progammer! In classic LinkedIn style you should put this skill on your page immediately and ask your neighbors for endorsements. Watch the recruiting emails come rolling in. 
+
 ---
 
 ## Part 2: Functions
 
 ### Anonymous Functions
 
-Function literal syntax is a bit different in Haskell as well. In Scala, we'd write `(h,t) => ...`, in Haskell, we write `\h t -> ...`. The parameters to a lambda function mirrors the syntax for function application, with parameters separated by spaces. Following the parameter list is the `->`, then the body of the lambda. 
+Function literal syntax is a bit different in Haskell than in Scala. In Scala, we'd write `(h,t) => ...`, in Haskell, we write `\h t -> ...`. The parameters to a lambda function mirrors the syntax for named function application (see below), with parameters separated by spaces. Following the parameter list is the `->`, then the body of the lambda. So, for example:
 
+```
 Prelude> (\x -> 2*x) 10
 20
+```
+
+I can also get type information about anonymous functions (indeed about pretty much anything in Haskell), by using the `:type` or `:t` command like so:
+
+```
+Prelude> :t (\x -> 2*x) 
+(\x -> 2*x) :: Num a => a -> a
+```
+
+Note that function types are written using `->` instead of `=>` as in Scala. 
+
+
+
+### Task (2a): Functions Eating Functions
+
+In Haskell functions are [first class objects](https://en.wikipedia.org/wiki/First-class_function), which means we can pass functions to functions just as easily as we can pass other data types. Make a lambda function that eats another function and applies it to the value 2, then feed it the lambda `(\y -> y + 2)`. What result do you get?
+
+Now use the `:t` command on your first lambda, what kind of type is it?
+
+This snippet shows a few new things. Let's start by looking at the type signature. What's with all the `->` symbols? Functions in Haskell are curried by default. Although we can write `(Int,Int) -> Int`, for the type of a function that expects a pair of integers and returns an `Int`, we almost always work with curried functions in Haskell and the language has special support for interpreting curried function application efficiently. The `->` operator is right-associative, so for example the type `(a -> b -> b) -> b -> List a -> b` can be read the same way you'd read the Scala signature:
+
+```Scala
+def foldRight[A,B](f: (A,B) => B, z: B, xs: List[A]): B
+```
+
+Note also that unlike Scala, Haskell does not have a distinction between `val`, `def`, `lazy val`, and `var` (data are immutable and lazily evaluated). All declarations use the same syntax, a symbol name, followed by any arguments or patterns, followed by an `=` sign, followed by the body of the definition. 
+
+### Task (2b): Partial Application
+
+Make a lambda function that adds two numbers together and apply it to the values 5 and 10 as above. Experiment with using the `:t` command on the lambda when applied to both, one, or no arguments respectively. In the last case the resulting type should be `Num a => a -> a -> a`, which is similar but not quite equal to what you had in Task (2b). Any ideas why?
+
+
+### Task (2c): Googling Errors
+
+If you enter your lambda function from above into GHCi without any arguments, you should get an error that looks something like this:
+
+```
+No instance for (Show (a0 -> a0 -> a0)) (maybe you haven't applied enough arguments to a function?)
+```
+
+WTF? Never fear, this is an opportunity to participate in the time-honored programming tradition known as 'Googling your error'. When I Googled the first part of that error (without the suggestion), my top hit was the following link:
+
+http://stackoverflow.com/questions/18615666/no-instance-for-show-a0-arising-from-a-use-of-print-the-type-variable-a0-i
+
+That's somewhat useful (& you should definitely make friends with SO, a fun place to start is with the [Zalgo post](http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags)), however the answer is over-specific. We can help ourselves by removing the (rather specific) type information from our error message. Try Googling `No instance for Show` instead. You should get a wider variety of results including [this one](http://users.jyu.fi/~sapekiis/haskell-pitfalls/#no-instance-for-show), which tells us that we need to define the show function from the Show type class. We'll discuss type classes next week.
 
 
 ### Named Functions
 
-Let's look at a couple function definitions: 
+Lambdas are great, but at some point you have to start giving functions names. Here are two equivalent ways to do that:
 
-```Haskell
+```
+inc = \x -> x+1
+```
+or
+
+```
+inc x = x+1
+```
+
+The syntax for function application is simple juxtaposition, with arguments separated by spaces, as in `go n 1` (vs `go(n, 1)` in Scala). Function application is left-associative and binds tighter than any other operation, so `f x y+1` would actually be parsed as `(f x y) + 1`, and we can use parentheses to obtain a desired grouping.
+
+
+```
+factorial 0 = 1
+factorial n = n * factorial (n-1)
+```
+
+This example demonstrates some simple pattern matching in Haskell, matching on the numeric literal `0`. We can write a function's name several times, supplying a pattern for each argument. Patterns are matched top to bottom, as in Scala. We'll talk more about Haskell's pattern matching in the next section.
+
+You can optionally preface a funtion with its type signature like so:
+
+```
 factorial :: Int -> Int
 factorial 0 = 1
 factorial n = n * factorial (n-1)
+```
 
+This is not required, but it is considered good form when writing actual programs.
+
+### Task (2d): Functions in the REPL
+
+You can put `factorial` into a file and compile it like we did with our HelloWorld function, but let's try to define it directly in the REPL.
+
+You can define multi-line functions in the REPL by using the `let` keyword and braces like so:
+
+```
+let { factorial 0 = 1 ; factorial n = n * factorial (n-1) }
+```
+
+Try that and then make sure `factorial 3` gives the result you'd expect (i.e. 6). Now lets try a [second way](http://stackoverflow.com/questions/2846050/how-to-define-a-function-in-ghci-across-multiple-lines):
+
+```
+Prelude> :{
+Prelude| let factorial 0 = 1
+Prelude|     factorial n = n * factorial (n-1)
+Prelude| :}
+Prelude> factorial 3
+6
+```
+
+Do this yourself. If you're not careful you may get an error like this: `<interactive>:156:3: parse error on input ‘where’`. That's because, like Python, Haskell is sensitive to white-space. Basically that means that Haskell determines where blocks begin and end based on indentation. Certain keywords (like `let` and `where`) introduce a _layout block_. Check out the [following link](https://en.wikibooks.org/wiki/Haskell/Indentation) to get the hang of how to indent code properly.
+
+
+### Where and Let 
+
+Let's look at a couple of other definitions for the factorial function: 
+
+```Haskell
 factorial' :: Int -> Int
 factorial' n = go n 1
   where go 0 acc = acc
@@ -229,80 +362,92 @@ factorial'' n =
 ```
 
 A few things about this code:
-
-* Function types are written using `->` instead of `=>` as in Scala. 
 * Identifier names in Haskell can contain the `'` symbol (as well as `_`, letters, and numbers, though data types must start with a capital letter and other identifiers cannot start with a number or `'`). 
-* The syntax for _function application_ is simple juxtaposition, with arguments separated by spaces, as in `go n 1` (vs `go(n, 1)` in Scala). Function application is left-associative and binds tighter than any other operation, so `f x y+1` would actually be parsed as `(f x y) + 1`, and we can use parentheses to obtain a desired grouping.
 * We are also making use of a local function to write our loop in both `factorial'` and `factorial''`, much like we'd do in Scala, though unlike Scala, _all tail calls are optimized_. Syntactically, we can place local definition(s) _after_ the expression that references it, using a `where`-clause (used in `factorial'`) or we can place the local definitions _before_ the expression referencing it, using a `let` expression (used in `factorial''`).
-* These examples demonstrate some simple pattern matching in Haskell, matching on the numeric literal `0`. We can write a function's name several times, supplying a pattern for each argument. Patterns are matched top to bottom, as in Scala. We'll talk more about Haskell's pattern matching in the next section.
 
-_Note:_ Haskell determines where blocks begin and end based on indentation. Certain keywords (like `let` and `where`) introduce a _layout block_. Read [all about the details here](http://en.wikibooks.org/wiki/Haskell/Indentation).
+### Task (2e): Tail Recursion (Optional)
 
-Lastly, we note that unlike Scala, Haskell does not have a distinction between `val`, `def`, `lazy val`, and `var`. All declarations use the same syntax, a symbol name, followed by any arguments or patterns, followed by an `=` sign, followed by the body of the definition. 
+`factorial` and `factorial'` are both recursive, but only `factorial'` is [tail recursive](https://en.wikipedia.org/wiki/Tail_call). Why?
 
-### Task (2a): Defining Functions 
+### Task (2f): Fibonacci
 
-You can put this into a file and compile 
-You can also define multi-line functions in the REPL by setting multi-line mode (`:set +m`) or using braces:
+Using the `factorial` code above as a model, write a function `fibonacci` that computes the nth [Fibonacci number](https://en.wikipedia.org/wiki/Fibonacci_number):
 
 ```
-let { factorial 0 = 1 ; factorial n = n * factorial (n-1) }
+Prelude> map fibonacci [0..10]
+[1,1,2,3,5,8,13,21,34,55,89]
 ```
-
-http://stackoverflow.com/questions/2846050/how-to-define-a-function-in-ghci-across-multiple-lines
-
-```
-Prelude> :{
-Prelude| let factorial 0 = 1
-Prelude|     factorial n = n * factorial (n-1)
-Prelude| :}
-Prelude> factorial 3
-6
-```
-
-This snippet again shows a few new things. Let's start by looking at the type signature. What's with all the `->` symbols? Functions in Haskell are curried by default. Although we can write `(Int,Int) -> Int`, for the type of a function that expects a pair of integers and returns an `Int`, we almost always work with curried functions in Haskell and the language has special support for interpreting curried function application efficiently. The `->` operator is right-associative, so the type `(a -> b -> b) -> b -> List a -> b` can be read the same way you'd read the Scala signature:
-
-```Scala
-def foldRight[A,B](f: (A,B) => B, z: B, xs: List[A]): B
-```
-
-Prelude> :load learn.hs
-
-
-### Task (2a): Currying 
-
 
 ## Part 3: Lists and Strings
 
-import Data.List
-elemIndex 'b' "abc" === Just 1
-A really good tool for finding haskell functions is [Hoogle](https://www.haskell.org/hoogle/), which allows you to search by type signature among other things.
+Lists are probably the most used data structure in Haskell. In this section we'll look at the basics of lists, strings (which are lists) and list comprehensions.
 
-###  syntax and higher order functions 
+### Lists 
 
-Lists in Haskell come built in and have some special syntax. We write the type `List Int` as `[Int]`, we write `Nil` as `[]`, and `Cons h t` as `h:t`. The `:` operator is right-associative, so `1:2:[]` is equal to `1:(2:[])`. And we can write list literals using the syntax `[1,2,3,4]`, `["a","b"]`. 
+A list is a homogenous data structure. It stores several elements of the same type. That means that we can have a list of integers or a list of characters but we can't have a list that has a few integers and then a few characters. We can write list literals using the syntax `[1,2,3,4]`, `["a","b"]`.
 
+Lists in Haskell come built in and have some special syntax. We write the type `List Int` as `[Int]`, we write `Nil` as `[]`, and `Cons h t` as `h:t`. 
 
-### Task (3a):
+### Task (3a): WTF is Cons?
 
-Write a function `myLast` that extracts the last element of a list.
+Anytime you are not sure what something is in Haskell, check out its type:
 
 ```
-Prelude> myLast [1,2,3,4]
-4
-Prelude> myLast ['x','y','z']
-'z'
+:t (:)
 ```
-#### Answer
 
-```Haskell
-myLast :: [a] -> a
-myLast [] = error "No end for empty lists!"
-myLast [x] = x
-myLast (_:xs) = myLast xs
+Now that you know the two things it eats, try feeding it two of those things and see what it spits out. What does `:` do?
+
+
+### Task (3a): Heads and Tails
+
+Two more commonly used list functions are `head` and `tail`. Test these out and then combine them to make a function `foo` that gets the second element of a list like so:
+
+```
+Prelude> foo [1,2,3,4]
+2
+Prelude> foo "Yoyoyo"
+'o'
+```
+
+### Strings
+
+As we just saw, a string is simply a list of characters.
+
+```
+Prelude> 'i' : []
+"i"
+Prelude> 'h' : "i"
+"hi"
+Prelude> head "They alive, dammit!"
+'T'
+```
+
+### Task (3b): Hoogle it
+
+A really good tool for finding haskell functions is [Hoogle](https://www.haskell.org/hoogle/), which allows you to search by type signature among other things. Get the type of `foo` and enter it into Hoogle. What other functions have that same type?
+
+### Ranges
+
+A super handy way to make a list is using ranges:
+
+```
+Prelude> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+Prelude> ['a' .. 'z']
+"abcdefghijklmnopqrstuvwxyz"
+```
+
+You can also specify steps:
+
+```
+Prelude> [1,3 .. 10]
+[1,3,5,7,9]
 ```
 
 ### List Comprehensions
+
+The pattern of chaining operations is so useful and is used for lots of different things in Haskell that it has its own operator `>>=` (called bind). It is equivalent to `flatMap` in Scala.
 
 ```Haskell
 [1..10] >>= (\x -> if odd x then [x*2] else [])
@@ -311,14 +456,8 @@ myLast (_:xs) = myLast xs
 ### Task (3c): Repeat the odd numbers in a List
 
 Use the bind operator and a lambda to repeat the odd numbers in a List. So the list `[1..10]` should generate the list `[1,1,2,3,3,4,5,5,6,7,7,8,9,9,10]`
-
-
-### (3c): 
-
-It turns out the pattern of chaining operations is quite useful and is used for lots of different things in Haskell.
-
-The examples above use things called monads, which are like computation builders. The common theme is that the monad chains operations in some specific, useful way. In the list comprehension, the operations are chained such that if an operation returns a list, then the following operations are performed on every item in the list. 
-
+ 
+The examples above use things called monads, which are like computation builders. The common theme is that the monad chains operations in some specific, useful way. In the list comprehension, the operations are chained such that if an operation returns a list, then the following operations are performed on every item in the list.
 
 ### Task (3c): Functional IO
 
