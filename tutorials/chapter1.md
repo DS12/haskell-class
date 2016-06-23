@@ -8,15 +8,6 @@ Haskell is in many ways a nicer language for functional programming than Scala, 
 
 First things first. Lets all make sure we have Haskell installed and we have a decent text editor. To get Haskell we will use [Homebrew](http://brew.sh/), which is a package manager for OSX. Check to 
 
-In this tutorial we aim to review, define or explain
- 
-* inheritance
-* Multiple inheritance and the "diamond problem"
-* composition / mix-ins
-* implicit conversions
-* type classes, and
-* implicit parameters
-
 
 ### Task (0a): Install Homebrew
 
