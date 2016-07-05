@@ -4,8 +4,7 @@
 
 As you've seen briefly, there are many different kinds of data we interact with when writing programs. You've already
 seen `Integer`s like the numbers 1,2,3,4 ; `String`s like the series of characters `"hello world"` ; as well as lists
-like the collection of numbers `[1,2,3,4]`. One common kind is called a `Float` which represents a number with decimals.
-For example, 1.2345. These different kinds of data referred to as different "types". By thinking  about the type of our
+like the collection of numbers `[1,2,3,4]`. Another common kind is a `Float` which represents a number with decimals (for example, 1.2345). These different kinds of data referred to as different "types". By thinking  about the type of our
 data, we can catch mistakes before we actually execute our code. And whether we like to admit it
 or not, we are always dealing with types (even when the language doesn't make it explicit) because we make implicit
 assumptions in our code. For example:
@@ -48,7 +47,7 @@ A more generic function would probably take two `Float`s instead of `Int`s but y
 Also, it is helpful to know that you can always check the type signature of a function (and
 basically everything else) in the REPL by starting the statement with `:t`:
 
-```
+```haskell
 Prelude > :t "Hello"
 "hello" :: [Char]
 ```
