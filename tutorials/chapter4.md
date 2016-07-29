@@ -39,7 +39,7 @@ With Fibonacci, these questions were answered for us in the definition of the se
 
 ## Part 2
 
-Let's write a function that will take a list of integers and pull out the biggest one. For simplicity, let's say that the maximum of an empty list is `0`.
+Let's write a function that will take a list of integers and pull out the biggest one. For simplicity, let's say that the maximum of an empty list is `minBound`.
 
 ```
 biggest :: [Int] -> Int
@@ -66,7 +66,7 @@ biggest (x:xs)
     | otherwise  = (biggest xs)
 ```
 
-OK, the first line is the old type declaration. The second is the base case, since we defined the biggest element from an empty list to be `0` for this exercise. The third line is a pattern match. If the input isn't empty, we break it down in terms of its first element and its tail.
+OK, the first line is the old type declaration. The second is the base case, since we defined the biggest element from an empty list to be `minBound` for this exercise. The third line is a pattern match. If the input isn't empty, we break it down in terms of its first element and its tail.
 
 The last two lines are just Fact 1 and Fact 2 translated into code.
 
@@ -74,7 +74,7 @@ Note that we could also have used a `where` binding to avoid writing `biggest xs
 
 ```
 biggest :: [Int] -> Int
-biggest [] = 0
+biggest [] = minBound
 biggest (x:xs)
     | x > biggestFromTail  = x
     | otherwise  = biggestFromTail
@@ -84,7 +84,7 @@ biggest (x:xs)
 In fact, `biggest` is already implemented for you in Haskell, though it is called `maximum`.
 
 ### (2b)
-Write a function `smallest :: [Int] -> Int` that computes the smallest number from a list. Let's define the smallest number in the empty list to be `0`.
+Write a function `smallest :: [Int] -> Int` that computes the smallest number from a list. Let's define the smallest number in the empty list to be `maxBound`.
 
 ### (2c)
 Write a function `contains :: (Eq a) => a -> [a] -> Bool` that tests if an element lies in a list. For example:
