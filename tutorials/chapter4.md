@@ -60,7 +60,7 @@ Now all we have to do is convert the statements above into code. Here's how we d
 
 ```
 biggest :: [Int] -> Int
-biggest [] = 0
+biggest [] = minBound
 biggest (x:xs)
     | x > (biggest xs)  = x
     | otherwise  = (biggest xs)
