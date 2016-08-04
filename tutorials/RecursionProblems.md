@@ -3,11 +3,11 @@ Here is a list of fun recursion problems. Try working through them in order, and
 
 If you haven't already, take a look at the [Recursion chapter](https://github.com/DS12/haskell-class/blob/master/tutorials/chapter4.md) of these notes. That chapter explains recursion and walks you through some examples.
 
-Many of the functions in this document are implemented in Haskell already. When this is the case, the function you write will have `my-` added to its name. For example, there is a `length` function in Haskell, so the function you will implement `myLength`.
+Many of the functions in this document are implemented in Haskell already. When this is the case, the function you write will have `my-` added to its name. For example, there is a `length` function in Haskell, so you will name your function `myLength`.
 
 You should supply type signatures for all of these functions. Doing so will force you to clarify your thinking and will make writing the function body much easier.
 
-## Part 0: `myLength`
+## Part 0: `myLength` and `secondSmallest`
 
 ### (0a)
 Write a function called `myLength` that computes the length of a list. You should  be able to get these results, for example:
@@ -21,6 +21,16 @@ Prelude> myLength "cat"
 3
 Prelude> myLength ["apple", "banana", "pear", "melon"]
 4
+```
+
+### (0b)
+Write a function called `secondSmallest` that finds the second smallest element in a list. (Hint: which of the functions you implemented in the Recursion chapter would be useful here?)
+
+```
+Prelude> secondSmallest [1,2,4,8,0]
+1
+Prelude> secondSmallest [99,100,2]
+99
 ```
 
 ## Part 1: `mySum` and `myProduct`
@@ -64,16 +74,6 @@ Prelude> myFilter (/= 'a') "abcd"
 ## Part 3
 
 ### (3a)
-Write a function called `sumSquares` that takes a list of numbers and computes the sum of their squares. Hint: can you reuse functions you've already written?
-
-```
-Prelude> sumSquares [1,2,3]
-14
-Prelude> sumSquares [1.0, 2.5, 4.5]
-27.5
-```
-
-### (3b)
 Write a function `myReverse` that reverses a list.
 
 ```
@@ -81,4 +81,18 @@ Prelude> myReverse "abcd"
 "dcba"
 Prelude> myReverse [1,3,5,9999]
 [9999,5,3,1]
+```
+
+### (3b)
+A list is a _palindrome_ if it reads the same backwards as it does forwards. For example, `"stressed desserts"` is a palindrome.
+
+Write a function `isPalindrome` that returns `True` if its input is a palindrome and `False` if not.
+
+```
+Prelude> isPalindrome "stressed desserts"
+True
+Prelude> isPalindrome [1,2,3,2,1]
+True
+Prelude> isPalindrome [1,2,3,2]
+False
 ```
